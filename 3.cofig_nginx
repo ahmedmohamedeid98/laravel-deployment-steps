@@ -1,0 +1,49 @@
+//===========================
+// Config NGINX
+//===========================
+
+/* go to nginx directory */
+> cd /etc/nginx
+
+/* open sites-available directory and create new file for your project */
+> cd sites-available
+> sudo nano project_name
+
+/* past the default setting for nginx */
+
+/* create a symbol link between block file in the sites-available into sites-enabled */
+> sudo ln -s /etc/nginx/sites-available/project_name /etc/nginx/sites-enabled/
+
+/* delete default config for nginx that exist in sites-available */
+> sudo rm default
+
+/* go to sites-enabled and delete the sym link as well */
+> sudo rm default
+
+/* reload nginx */
+> sudo service nginx reload
+
+
+/* init config */
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+
+
+        root /var/www/laracast/public;
+
+        # Add index.php to the list if you are using PHP
+        index index.html index.htm index.php;
+        
+        location / {
+        	try_files $uri $uri/ /index.php?$query_string;
+    	}
+    	
+    	location ~ \.php$ {
+        	fastcgi_pass unix:/var/run/php/php8.1-fpm.sock; # Replace with the path to your PHP-FPM socket
+        	fastcgi_index index.php;
+        	fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        	include fastcgi_params;
+    	}
+}
