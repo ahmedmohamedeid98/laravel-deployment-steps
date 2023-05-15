@@ -1,0 +1,41 @@
+//========================
+// Install Nginx & php
+//========================
+
+/* update the instance */
+> sudo apt update
+
+/* install nginx and php fpm */
+/* INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx*/
+> sudo apt install nginx php8.1-fpm
+
+/* verify the nginx is running by visiting ip address on the instance */
+/* if not work handel security group to allow port 80 and 443 */
+/* if using stack template add add to securityGroupIngress */
+{
+   "IpProtocol": "tcp",
+   "FromPort": "80",
+   "ToPort": "80",
+   "CidrIp": "0.0.0.0/0"
+},
+{
+   "IpProtocol": "tcp",
+   "FromPort": "443",
+   "ToPort": "443",
+   "CidrIp": "0.0.0.0/0"
+},
+
+/* to deply template update */
+> aws cloudformation deploy --stack-name your_stack_name --template-file $PWD/stack.json
+
+/* install the lib needed to run composer and install the app dependances */
+> sudo apt install zip unzip php8.1-zip php8.1-curl php8.1-xml
+
+/* install composer */
+> curl -sS https://getcomposer.org/installer | php
+
+/* move composer to bin to enable us run composer command from anywhere */
+> sudo mv composer.phar /usr/local/bin/composer
+
+/* run composer version to ensure installation */
+> composer --version
