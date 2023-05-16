@@ -1,17 +1,25 @@
+///***************
+// Information source: Laracast website
+// instructor: Mohamed Said
+// course name: Servers for Laravel
+///***************
+
+
 //========================
 // Install Nginx & php
 //========================
 
-/* update the instance */
+// update the instance 
 > sudo apt update
 
-/* install nginx and php fpm */
-/* INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx*/
+// install nginx and php fpm 
+// INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx
 > sudo apt install nginx php8.1-fpm
 
-/* verify the nginx is running by visiting ip address on the instance */
-/* if not work handel security group to allow port 80 and 443 */
-/* if using stack template add add to securityGroupIngress */
+// verify the nginx is running by visiting ip address on the instance 
+// Allowing Access on Port 80 and 443 
+// if you are using aws console update your security group 
+// else if you are using stack template add add to securityGroupIngress 
 {
    "IpProtocol": "tcp",
    "FromPort": "80",
@@ -24,20 +32,19 @@
    "ToPort": "443",
    "CidrIp": "0.0.0.0/0"
 },
-
-/* to deply template update */
+// to deply template update 
 > aws cloudformation deploy --stack-name your_stack_name --template-file $PWD/stack.json
 
-/* install the lib needed to run composer and install the app dependances */
+// install the necessary software to run composer and install the app dependances 
 > sudo apt install zip unzip php8.1-zip php8.1-curl php8.1-xml
 
-/* install composer */
+// install composer 
 > curl -sS https://getcomposer.org/installer | php
 
-/* move composer to bin to enable us run composer command from anywhere */
+// move composer to bin to enable us run composer command from anywhere 
 > sudo mv composer.phar /usr/local/bin/composer
 
-/* run composer version to ensure installation */
+// run composer version to ensure installation 
 > composer --version
 
 
@@ -46,61 +53,56 @@
 //========================
 
 
-/* Link to project in github */
-/* generate ssh to add it to gihub */
+// Generating an SSH key on the server and adding it to the GitHub repo. 
 > ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
 
-/* print a key */
+// print the public key 
 > cat /home/ubuntu/.ssh/id_rsa.pub
 
-/* copy the key to github project setting deploy keys. */
-/* change the owner (first time) */
-/* change the owner for directory name */
+// change the owner (first time) 
 > sudo chown ubuntu:ubuntu www
 
-/* clone the project inside the www directory */
-/* go inside the project directory and run */
+// clone the project inside the www directory 
+// go inside the project directory and run 
 > composer install
 
 create .env file
 
-/* generate application key */
+// generate application key 
 > php artisan key:generate
 
-/* change the owner of the www direcotry to www-data */
-/* php-fpm and nginx use `www-data` user to access the site's files */
-/* nginx need to only read the the site's files while php-fpm need to read and write */
+// change the owner of the www direcotry to www-data 
+// php-fpm and nginx use `www-data` user to access the site's files 
+// nginx need to only read the the site's files while php-fpm need to read and write 
 > sudo chown -R www-data:www-data www
 
 
 
 //===========================
-// Config NGINX
+// Configuring Nginx to serve our Laravel application for all requests coming to the server through its IP address.
 //===========================
 
-/* go to nginx directory */
+// go to nginx directory 
 > cd /etc/nginx
 
-/* open sites-available directory and create new file for your project */
+// To configure Nginx to serve our Laravel application, we need to create an Nginx configuration block. Create a new file in the /etc/nginx/sites-available directory and paste the init configuration block 
 > cd sites-available
 > sudo nano project_name
 
-/* past the default setting for nginx */
-
-/* create a symbol link between block file in the sites-available into sites-enabled */
+// Save the file and create a symbolic link between the block file that's inside the sites-available directory into the sites-enabled directory 
 > sudo ln -s /etc/nginx/sites-available/project_name /etc/nginx/sites-enabled/
 
-/* delete default config for nginx that exist in sites-available */
+// delete default config for nginx that exist in sites-available 
 > sudo rm default
 
-/* go to sites-enabled and delete the sym link as well */
+// go to sites-enabled and delete the sym link as well 
 > sudo rm default
 
-/* reload nginx */
+// Finally, reload Nginx 
 > sudo service nginx reload
 
 
-/* init config */
+// init configuration block 
 server {
         listen 80 default_server;
         listen [::]:80 default_server;
@@ -126,81 +128,80 @@ server {
 
 
 //===============================
-// Create User
+// Isolating Apps
 //===============================
 
-/* INFO: we will consider our project name is `laracasts` and we will create user with name `laracasts` */
+// So right now we have our Laravel application up and running on the VPS. Nginx runs as a web server and phpFPM works with it to maintain a pool of PHP processes that handle the requests coming from Nginx. The Laravel application is owned by an Ubuntu user called www-data, which is used by both Nginx and phpFPM to read and write files. 
 
-/* Isolated the site within a directory owned by a dedicated user, laracasts. and nginx along with php-fpm can access the files in this 
-   directory as they need */
-   
-/* INFO: create user for each site allow this user to pull from the git repo and restrict its access to only the site it owns. */
+// INFO: we will consider our project name is `laracasts` and we will create user with name `laracasts` 
+
+// INFO: create user for each site allow this user to pull from the git repo and restrict its access to only the site it owns. 
 
 
-/* add user */
+// we are going to create a new user for each site, allow this user to pull from the git repository and restrict its access to only the site it owns. 
 > sudo adduser laracasts
 
-/* move the application files from the defaut var/www to the laracasrs user's home directory */
+// Now let's move our application files from the default /var/www to the laracasts user's home directory 
 > sudo mv /var/www/laracasts /home/laracasts/www
 
-/* INFO: now if we check the home direcory we will find two users one for ubuntu user and one for laracasts user */
+// INFO: now if we check the home direcory we will find two users one for ubuntu user and one for laracasts user 
 
 
-/* move from ubuntu user to laracasts user */
+// move from ubuntu user to laracasts user 
 > sudo su laracasts
 
-/* check the laracast direcory we will find www directory still owned by www-data user, 
+// check the laracast direcory we will find www directory still owned by www-data user, 
    we need to change the ownership to the laracasts user and group,
-   and to do that we need to exist our laracasts session and go back to ubunutu  */
+   and to do that we need to exist our laracasts session and go back to ubunutu  
 > exit or ctrl + d
 > sudo shown -R laracasts:laracasts /home/laracasts/www
 > ll
    
-/* INFO: after list, we see the permissions on each of the home directories here indicate that the owner can read, write and execute.
-	 members for the group can read and execute only. and all other users can not do anything inside these directories */
+// INFO: after list, we see the permissions on each of the home directories here indicate that the owner can read, write and execute.
+	 members for the group can read and execute only. and all other users can not do anything inside these directories 
 
-/* Since all the site files now belongs to the laracasts user group, www-data won't be able to access them, and to fix that we are going to add
+// Since all the site files now belongs to the laracasts user group, www-data won't be able to access them, and to fix that we are going to add
    www-data user to the laracasts group, this will allow it to read files but won't write.
-   and then we are going to change the user used by phpfpm to laracasts instead of www-data, so it can read and write files in this directory */
+   and then we are going to change the user used by phpfpm to laracasts instead of www-data, so it can read and write files in this directory 
 
 > sudo usermod -a -G laracasts www-data
 
-/* Then let's open the php-fpm pool configurations */
+// now we need to update the Nginx and phpFPM configuration to use the new laracasts user instead of the www-data user 
 > sudo nano /etc/php/8.1/fpm/pool.d/www.conf
 
-/* UPDATE FILE: we will first change the name of the pool from www to laracasts, we will create separate pools for all sites on the server */
+// UPDATE FILE: we will first change the name of the pool from www to laracasts, we will create separate pools for all sites on the server 
 > www -> laracasts
-/* UPDATE FILE: then we will find an attribute called user and change it to laracasts. */
+// UPDATE FILE: then we will find an attribute called user and change it to laracasts. 
 > www-data -> laracasts
-/* UPDATE FILE: then we find an attribute name owner, change it to laracasts. and same for the group as well */
+// UPDATE FILE: then we find an attribute name owner, change it to laracasts. and same for the group as well 
 > www-data -> laracasts
-/* INFO: the first user and group attribute decide which user php-fpm will use when reading and writing the application files, 
+// INFO: the first user and group attribute decide which user php-fpm will use when reading and writing the application files, 
 	 the listen owner and listen group attributes decide the owners of the socket file php-fpm creats as a communication channel between
-	 it and nginx */
+	 it and nginx 
 
-/* INFO: Since the owner and group are set to laracasts, phpfpm will be able to read and write on this files. 
-	 and since the www-data user used by nginx now belongs to the laracasts group it will also able to read and write on this file. */
+// INFO: Since the owner and group are set to laracasts, phpfpm will be able to read and write on this files. 
+	 and since the www-data user used by nginx now belongs to the laracasts group it will also able to read and write on this file. 
 
-/* INFO: the default permissions on that socket file is 660 which means that owners can read and write, the user and the group member as well */
+// INFO: the default permissions on that socket file is 660 which means that owners can read and write, the user and the group member as well 
 
-/* So now let's go edit the nginx configuration file */
+// So now let's go edit the nginx configuration file 
 > sudo nano /etc/nginx/sites-availabe/laracats
-/* UPDATE FILE: change root to /home/laracasts/www/public */
+// UPDATE FILE: change root to /home/laracasts/www/public 
 > /var/www/laracasts/public -> /home/laracasts/www/public
 
 
 
-/* restart nginx and fpm & clear cache if required */
+// restart nginx and fpm & clear cache if required 
 > sudo service nginx reload
 > sudo service php8.1-fpm restart
 
-/* to allow the laracasts user to pull from the github repo, and to do that we are going to move the keys we previously generated for
-   the ubuntu user to the laracasts user. that way laracasts can access the github repo */
+// to allow the laracasts user to pull from the github repo, and to do that we are going to move the keys we previously generated for
+   the ubuntu user to the laracasts user. that way laracasts can access the github repo 
    
 > sudo mkdir /home/laracasts/.ssh
 > sudo mv /home/ubuntu/.ssh/id_rsa.pub /home/laracasts/.ssh/id_rsa.pub
 > sudo mv /home/ubuntu/.ssh/id_rsa /home/laracasts/.ssh/id_rsa
-> sudo chown -R laracasts:laracasts /home/laracasts /* this will enclude the permission keys we are moved */
+> sudo chown -R laracasts:laracasts /home/laracasts // this will enclude the permission keys we are moved 
 > sudo chmod 0700 /home/laracasts/.ssh
 
 > sudo su laracasts
@@ -214,70 +215,70 @@ server {
 // Database
 //=======================
 
-/* install mysql-server */
+// install mysql-server 
 > sudo apt install mysql-server
 
-/* INFO: by default the root user that comes with every new MYSQL 8 installation doesn't allow password authentication
-	 we will change that so we can run a special shell script that will take care of many of the installation setps for us. */
+// INFO: by default the root user that comes with every new MYSQL 8 installation doesn't allow password authentication
+	 we will change that so we can run a special shell script that will take care of many of the installation setps for us. 
 	 
-/* log into mysql server */
+// log into mysql server 
 > sudo mysql
 
-/* set password for the root user */
-/* INFO: the caching_sha2_password plugin only available for laravel >= 8.0  */
+// set password for the root user 
+// INFO: This caching_sha2_password plugin is only available in MySQL 8. Other Laravel applications may not work with this plugin, so make sure your application runs on Laravel 8 or higher.  
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '12345678';
 
-/* exit and run the shell script */
+// exit and run the shell script 
 mysql> exit;
 > sudo mysql_secure_installation;
 
-/* INFO: first question ask if you want to install the validate password component which helps ensure all passwords for all
-	 mysql users are secure. (recommended, YES) */
+// INFO: first question ask if you want to install the validate password component which helps ensure all passwords for all
+	 mysql users are secure. (recommended, YES) 
 
-/* INFO: next the script ask if you want to reset the root user password ? */
+// INFO: next the script ask if you want to reset the root user password ? 
 
-/* INFO: next the script ask if you want to remove anaynomous users. this user is created by default so anyone with access to the VBS
-	 can access MySQL easily. (recommended, YSE) */
+// INFO: next the script ask if you want to remove anaynomous users. this user is created by default so anyone with access to the VBS
+	 can access MySQL easily. (recommended, YSE) 
 	 
-/* INFO: next you asked if you want to prevent connections as the root user from outside our server ? (recommended, YES) */
+// INFO: next you asked if you want to prevent connections as the root user from outside our server ? (recommended, YES) 
 
-/* INFO: next ask if you want to remove the test database that mysql creates by default ? */
+// INFO: next ask if you want to remove the test database that mysql creates by default ? 
 
-/* INFO: finally the scripts ask if we want to reload the privieges on MYSQL server ? YES */
+// INFO: finally the scripts ask if we want to reload the privieges on MYSQL server ? YES 
 
 
 
-/* now we will create database for our laravel application */
+// now we will create database for our laravel application 
 
-/* connect to mysql-server as root */
+// connect to mysql-server as root 
 > mysql -u root -p
 
-/* create the database */
-mysql> CREATE DATABASE laracasts CARACTER SET utf8 COLLACTE utf8_unicode_ci;
+// create the database 
+mysql> CREATE DATABASE laracasts CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-/* create mysql user dedicated to the laracasts application */
-mysql> CREATE USER 'laracasts'@'localhost' IDENTIFIED BY '148784845';
+// create mysql user dedicated to the laracasts application 
+mysql> CREATE USER laracasts@localhost IDENTIFIED BY '148784845';
 
-/* grant all privilege on laracasts database  */
+// grant all privilege on laracasts database  
 mysql> GRANT ALL PRIVILEGES ON laracasts.* TO 'laracasts'@'localhost';
 
-/* flush the privileges to clear mysql server cache */
+// flush the privileges to clear mysql server cache 
 mysql> FLUSH PRIVILEGES;
 
-/* finally exit */
+// finally exit 
 mysql> exit;
 
-/* next step is installing the mysql php extenstion so our laravel application can connect to mysql database */
-```> sudo apt install php8.1-mysql```
+// next step is installing the mysql php extenstion so our laravel application can connect to mysql database 
+> sudo apt install php8.1-mysql
 
-/* update .env file  */
+// update .env file  
 DB_USERNAME=laracasts
 DB_PASSWORD=148784845
 
-/* migrate the database */
+// migrate the database 
 > php artisan migrate
 
-/* OPTIONAL: connect to database remotly (select ssh connection in tableplus) */
+// OPTIONAL: connect to database remotly (select ssh connection in tableplus) 
 MySQL Host: localhost
 USERNAME: laracasts
 PASSWORD: 148784845
@@ -287,6 +288,130 @@ SSH USER: ubuntu
 SSH PASSWORD: Select the key pair file (.pem)
 
 THEN CONNECT.
+
+
+
+//==========================
+// Task Scheduling
+//==========================
+
+// Since our Laravel applications are isolated on different system users, 
+   it's better to isolate their cron configurations as well. For each Laravel application, 
+   we will use a separate cron configuration file. To do that, 
+   we will use the crontab command to edit the system user-specific cron file. 
+ 
+// we switch to the laracasts user 
+> sudo su laracasts
+
+// INFO: to test cron expression go to `https://crontab.guru/` 
+
+// to edit the user-specific cron file. run the following command, 
+> crontab -e
+
+// Updae file add cron job 
+*(every minute) *(hour) *(day) *(month) *(day on the week) php(version) (path_to_artisan) (command) >> (output_path) 2> (standered errors)
+* * * * * php8.1 /home/laracasts/www/artisan schedule:run >> /home/laracasts/www/storage/log/cron.log 2>&1
+
+// If you have multiple applications that need to run multiple schedule jobs at the same time, your server will be overwhelmed with work to do at the beginning of each minute.To avoid that, it's recommended that you dispatch those schedule jobs to the queue to be executed later via queue workers. 
+
+
+
+
+//====================
+// Install Redis and Running Workers
+//====================
+
+// Even though the database queue is production ready, Redis provides a huge performance boost for high throughput environments where your application or your application dispatches and processes thousands of jobs every hour. 
+
+// To install the Redis server library 
+> sudo apt install redis-server
+
+// To verify that the Redis server is running, let's use the Redis CLI to communicate with the server. 
+> redis-cli
+
+// Then we run the ping command, if we receive pong then the server is running.  
+127.0.0.1:6379> PING
+PONG
+
+// Now let's install the Redis PHP extension. 
+> sudo apt install php8.1-redis
+
+// Verify that the extension was installed by using the php command to execute a code that initializes the Redis class. no errors, meaning that PHP has found the Redis class.
+> php -r "new Redis;";
+
+// switch to laracasts user, and go to www directory, then edit .env file
+QUEUE_CONNECTION=redis
+
+// We now need to run a few worker processes on the server to process jobs from the queue.
+// And to do that, we need a process management tool that starts the worker processes and ensures they are running at all times.
+// For Linux systems, there is an amazing process manager called Supervisor.
+// Let's install it on our machine and configure it to start a few workers and keep them running.
+// Let's first go back to the Ubuntu session. (exist from laracasts user session by press crtl + d)
+> sudo apt install supervisor
+
+// go to supervisor configuration directory
+> cd /etc/supervisor/conf.d
+
+// create new file 
+> sudo nano laracasts-workers.conf
+
+// copy the recommended configurations from the official Laravel documentation and paste it here, then customize it.
+[program:laracasts-workers] //updated
+process_name=%(program_name)s_%(process_num)02d
+command=php8.1 /home/laracasts/www/artisan queue:work // updated
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=laracasts // updated
+numprocs=3 // updated
+redirect_stderr=true
+stdout_logfile=/home/laracasts/www/storage/logs/workers.log // updated
+stopwaitsecs=3600
+
+// And before we continue there is a very old and very popular bug in Supervisor in which it creates the log files using the root user rather than the user defined in the configuration file.
+// And as a workaround let's create the file ourselves and assign the correct owner.
+> sudo touch /home/laracasts/www/storage/logs/workers.log
+> sudo chown laracasts:laracasts /home/laracasts/www/storage/logs/workers.log
+
+// Now let's tell Supervisor to read its configuration files 
+> sudo supervisorctl reread
+
+// Let's then update Supervisor so it starts running this new program.
+> sudo suoervisorctl update
+
+// Let's verify
+> sudo supervisorctl status laracasts-workers:*
+
+// switch to laracasts user
+> sudo su laracasts
+
+// dispatch a test jon, go to www directory
+> php artisan dispatch:test
+
+// One of the workers picked the job we just dispatched and then the output was sent to the log file. 
+// now we can check the workers.log file
+> nano /home/laracasts/www/storage/logs/workers.log
+
+// These 3 worker processes will remain up and running at all times.
+// And if any of them shut down for any reason, Supervider will start them back.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
