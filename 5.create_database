@@ -5,33 +5,37 @@
 // install mysql-server 
 > sudo apt install mysql-server
 
-// INFO: by default the root user that comes with every new MYSQL 8 installation doesn't allow password authentication
-	 we will change that so we can run a special shell script that will take care of many of the installation setps for us. 
+// by default the root user that comes with every new MYSQL 8 installation doesn't allow 
+// password authentication we will change that so we can run a special shell script that will 
+// take care of many of the installation setps for us. 
 	 
 // log into mysql server 
 > sudo mysql
 
 // set password for the root user 
-// INFO: This caching_sha2_password plugin is only available in MySQL 8. Other Laravel applications may not work with this plugin, so make sure your application runs on Laravel 8 or higher.  
+// This caching_sha2_password plugin is only available in MySQL 8. 
+// Other Laravel applications may not work with this plugin, so make sure your application runs on
+// Laravel 8 or higher.  
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '12345678';
 
 // exit and run the shell script 
 mysql> exit;
 > sudo mysql_secure_installation;
 
-// INFO: first question ask if you want to install the validate password component which helps ensure all passwords for all
-	 mysql users are secure. (recommended, YES) 
+// first question ask if you want to install the validate password component which helps 
+// ensure all passwords for all mysql users are secure. (recommended, YES) 
 
-// INFO: next the script ask if you want to reset the root user password ? 
+// next the script ask if you want to reset the root user password ? 
 
-// INFO: next the script ask if you want to remove anaynomous users. this user is created by default so anyone with access to the VBS
-	 can access MySQL easily. (recommended, YSE) 
+// next the script ask if you want to remove anaynomous users. this user is created by 
+// default so anyone with access to the VBS can access MySQL easily. (recommended, YSE) 
 	 
-// INFO: next you asked if you want to prevent connections as the root user from outside our server ? (recommended, YES) 
+// next you asked if you want to prevent connections as the root user from 
+// outside our server ? (recommended, YES) 
 
-// INFO: next ask if you want to remove the test database that mysql creates by default ? 
+// next ask if you want to remove the test database that mysql creates by default ? 
 
-// INFO: finally the scripts ask if we want to reload the privieges on MYSQL server ? YES 
+// finally the scripts ask if we want to reload the privieges on MYSQL server ? YES 
 
 
 

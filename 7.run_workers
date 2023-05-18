@@ -2,7 +2,9 @@
 // Install Redis and Running Workers
 //====================
 
-// Even though the database queue is production ready, Redis provides a huge performance boost for high throughput environments where your application or your application dispatches and processes thousands of jobs every hour. 
+// Even though the database queue is production ready, Redis provides a huge performance 
+   boost for high throughput environments where your application or your application dispatches 
+   and processes thousands of jobs every hour. 
 
 // To install the Redis server library 
 > sudo apt install redis-server
@@ -17,14 +19,16 @@ PONG
 // Now let's install the Redis PHP extension. 
 > sudo apt install php8.1-redis
 
-// Verify that the extension was installed by using the php command to execute a code that initializes the Redis class. no errors, meaning that PHP has found the Redis class.
+// Verify that the extension was installed by using the php command to execute 
+   a code that initializes the Redis class. no errors, meaning that PHP has found the Redis class.
 > php -r "new Redis;";
 
 // switch to laracasts user, and go to www directory, then edit .env file
 QUEUE_CONNECTION=redis
 
 // We now need to run a few worker processes on the server to process jobs from the queue.
-// And to do that, we need a process management tool that starts the worker processes and ensures they are running at all times.
+// And to do that, we need a process management tool that starts the worker processes 
+   and ensures they are running at all times.
 // For Linux systems, there is an amazing process manager called Supervisor.
 // Let's install it on our machine and configure it to start a few workers and keep them running.
 // Let's first go back to the Ubuntu session. (exist from laracasts user session by press crtl + d)
@@ -36,7 +40,9 @@ QUEUE_CONNECTION=redis
 // create new file 
 > sudo nano laracasts-workers.conf
 
-// copy the recommended configurations from the official Laravel documentation and paste it here, then customize it.
+// copy the recommended configurations from the official Laravel documentation and paste it here, 
+   then customize it.
+//----------------------------------------------
 [program:laracasts-workers] //updated
 process_name=%(program_name)s_%(process_num)02d
 command=php8.1 /home/laracasts/www/artisan queue:work // updated
@@ -49,8 +55,12 @@ numprocs=3 // updated
 redirect_stderr=true
 stdout_logfile=/home/laracasts/www/storage/logs/workers.log // updated
 stopwaitsecs=3600
+//-------------------------------------------------
 
-// And before we continue there is a very old and very popular bug in Supervisor in which it creates the log files using the root user rather than the user defined in the configuration file.
+
+// And before we continue there is a very old and very popular bug in Supervisor in which it 
+   creates the log files using the root user rather than the user defined in the configuration file.
+
 // And as a workaround let's create the file ourselves and assign the correct owner.
 > sudo touch /home/laracasts/www/storage/logs/workers.log
 > sudo chown laracasts:laracasts /home/laracasts/www/storage/logs/workers.log
@@ -68,7 +78,8 @@ stopwaitsecs=3600
 > sudo su laracasts
 
 // dispatch a test jon, go to www directory, 
-// this command may not be exist by default in your project so you have to create test one or test on any other
+// this command may not be exist by default in your project so you have to create test one or 
+   test on any other
 // created job you have.
 > php artisan dispatch:test
 

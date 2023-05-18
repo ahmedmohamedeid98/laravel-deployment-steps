@@ -1,5 +1,6 @@
 //===========================
-// Configuring Nginx to serve our Laravel application for all requests coming to the server through its IP address.
+// Configuring Nginx to serve our Laravel application for all requests coming to the server through 
+   its IP address.
 //===========================
 
 // go to nginx directory 
@@ -11,7 +12,8 @@
 > cd sites-available
 > sudo nano project_name
 
-// Save the file and create a symbolic link between the block file that's inside the sites-available directory into the sites-enabled directory 
+// Save the file and create a symbolic link between the block file that's inside the sites-available 
+   directory into the sites-enabled directory 
 > sudo ln -s /etc/nginx/sites-available/project_name /etc/nginx/sites-enabled/
 
 // delete default config for nginx that exist in sites-available 

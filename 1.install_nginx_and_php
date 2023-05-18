@@ -13,7 +13,8 @@
 > sudo apt update
 
 // install nginx and php fpm 
-// INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx
+// nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes 
+   that handle the requests coming from nginx
 > sudo apt install nginx php8.1-fpm
 
 // verify the nginx is running by visiting ip address on the instance 
