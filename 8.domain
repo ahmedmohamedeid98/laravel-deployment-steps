@@ -1,0 +1,85 @@
+//===================
+// Configuring Domain Names
+//===================
+
+
+// configure Nginx to serve different apps based on the domain name requests are targeting. 
+// For instance, if requests come for domain1.com, you instruct Nginx to route this request to app1. 
+// And if the request is targeting domain2.com, you direct Nginx to serve app2.
+
+// The first thing we do is edit the Nginx configuration file for our Laravel app.
+> sudo nano /etc/nginx/sites-available/laracasts
+
+// In this file, we configure the Nginx server to serve this app only when the requests are targeting
+// a specific domain. This involves editing the server name directive and replacing the 
+// underscore with our domain name.
+server_name _;  >> server_name mydomain.com;
+
+// Next, we stop making this server the default on port 80. 
+// This involves removing the default_server flag from the ibv4 and ibv6 listeners.
+listen 80 default_server;        >> listen 80;       // ibv4
+listen [::]:80 default_server;   >> listen [::]:80;  // ibv6
+
+// create a default server block that will catch all requests coming to the IP address of the VPS.
+> sudo nano default
+
+// Inside this file, we paste a server block which states that this is the default server
+// for requests coming on port 80 to this VPS. For those requests, 
+// we serve the default Nginx index.nginx-debian.html file located inside the /var/www/html directory. 
+// Alternatively, you can replace this with a regular 404.html page 
+// so clients sending requests on the IP address know that this is not acceptable. 
+// Once done, save the file.
+
+
+// We then create a symlink inside the sites-enabled directory
+> sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+// reload Nginx
+> sudo service nginx reload
+
+//=================
+// Redirecting the www Subdomain to the Root Domain
+//=================
+
+// we want to be able to serve our website on the www subdomain in addition to the root domain. 
+// However, serving the same content on two different URLs affect our score in most search engines.
+
+// To avoid that, we want to redirect requests targeting the www subdomain 
+// to the root domain or the naked domain. 
+
+
+// Nginx can help us redirect those requests without ever hitting the Laravel application.
+// edit our Nginx file that belongs to our Laravel application.
+> sudo nano /etc/nginx/sites-available/laracasts
+
+// We add a new server block
+server {
+	server_name www.mydomain.com;
+	return 301 $scheme:  //mydomain.com$request_uri;
+}
+
+// reload Nginx.
+> sudo service nginx reload
+
+
+//=========================
+// Hosting Another Laravel Application
+//=========================
+
+// To host another Laravel application, we simply follow the same process.
+
+// 1. Deploy your second Laravel application to a different directory on your server, 
+//    for example, /var/www/app2.
+
+// 2. Create a new Nginx server block file inside the sites-available directory. 
+//    This block should listen to the new domain and direct requests to the public directory of 
+//    the new Laravel application.
+
+// 3. Create a symlink for the new configuration file inside the sites-enabled directory.
+
+// 4. After making sure the syntax of the new configuration file is correct, reload Nginx.
+
+// 5. Add a new DNS record that points the new domain to the IP address of your VPS.
+
+// 6. Add a new server block that redirects requests targeting the www subdomain to the root domain.
+

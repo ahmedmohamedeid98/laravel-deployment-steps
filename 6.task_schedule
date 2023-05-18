@@ -1,0 +1,22 @@
+//==========================
+// Task Scheduling
+//==========================
+
+// Since our Laravel applications are isolated on different system users, 
+   it's better to isolate their cron configurations as well. For each Laravel application, 
+   we will use a separate cron configuration file. To do that, 
+   we will use the crontab command to edit the system user-specific cron file. 
+ 
+// we switch to the laracasts user 
+> sudo su laracasts
+
+// INFO: to test cron expression go to `https://crontab.guru/` 
+
+// to edit the user-specific cron file. run the following command, 
+> crontab -e
+
+// Updae file add cron job 
+*(every minute) *(hour) *(day) *(month) *(day on the week) php(version) (path_to_artisan) (command) >> (output_path) 2> (standered errors)
+* * * * * php8.1 /home/laracasts/www/artisan schedule:run >> /home/laracasts/www/storage/log/cron.log 2>&1
+
+// If you have multiple applications that need to run multiple schedule jobs at the same time, your server will be overwhelmed with work to do at the beginning of each minute.To avoid that, it's recommended that you dispatch those schedule jobs to the queue to be executed later via queue workers. 

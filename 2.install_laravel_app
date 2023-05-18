@@ -3,28 +3,25 @@
 //========================
 
 
-/* Link to project in github */
-/* generate ssh to add it to gihub */
+// Generating an SSH key on the server and adding it to the GitHub repo. 
 > ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
 
-/* print a key */
+// print the public key 
 > cat /home/ubuntu/.ssh/id_rsa.pub
 
-/* copy the key to github project setting deploy keys. */
-/* change the owner (first time) */
-/* change the owner for directory name */
+// change the owner (first time) 
 > sudo chown ubuntu:ubuntu www
 
-/* clone the project inside the www directory */
-/* go inside the project directory and run */
+// clone the project inside the www directory 
+// go inside the project directory and run 
 > composer install
 
 create .env file
 
-/* generate application key */
+// generate application key 
 > php artisan key:generate
 
-/* change the owner of the www direcotry to www-data */
-/* php-fpm and nginx use `www-data` user to access the site's files */
-/* nginx need to only read the the site's files while php-fpm need to read and write */
+// change the owner of the www direcotry to www-data 
+// php-fpm and nginx use `www-data` user to access the site's files 
+// nginx need to only read the the site's files while php-fpm need to read and write 
 > sudo chown -R www-data:www-data www

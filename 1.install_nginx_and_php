@@ -1,17 +1,25 @@
+////***************
+// Information source: Laracast website
+// instructor: Mohamed Said
+// course name: Servers for Laravel
+////***************
+
+
 //========================
 // Install Nginx & php
 //========================
 
-/* update the instance */
+// update the instance 
 > sudo apt update
 
-/* install nginx and php fpm */
-/* INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx*/
+// install nginx and php fpm 
+// INFO: nginx runs as a web server and php-fpm works with it to maintain a pool of PHP processes that handle the requests coming from nginx
 > sudo apt install nginx php8.1-fpm
 
-/* verify the nginx is running by visiting ip address on the instance */
-/* if not work handel security group to allow port 80 and 443 */
-/* if using stack template add add to securityGroupIngress */
+// verify the nginx is running by visiting ip address on the instance 
+// Allowing Access on Port 80 and 443 
+// if you are using aws console update your security group 
+// else if you are using stack template add add to securityGroupIngress 
 {
    "IpProtocol": "tcp",
    "FromPort": "80",
@@ -24,18 +32,17 @@
    "ToPort": "443",
    "CidrIp": "0.0.0.0/0"
 },
-
-/* to deply template update */
+// to deply template update 
 > aws cloudformation deploy --stack-name your_stack_name --template-file $PWD/stack.json
 
-/* install the lib needed to run composer and install the app dependances */
+// install the necessary software to run composer and install the app dependances 
 > sudo apt install zip unzip php8.1-zip php8.1-curl php8.1-xml
 
-/* install composer */
+// install composer 
 > curl -sS https://getcomposer.org/installer | php
 
-/* move composer to bin to enable us run composer command from anywhere */
+// move composer to bin to enable us run composer command from anywhere 
 > sudo mv composer.phar /usr/local/bin/composer
 
-/* run composer version to ensure installation */
+// run composer version to ensure installation 
 > composer --version

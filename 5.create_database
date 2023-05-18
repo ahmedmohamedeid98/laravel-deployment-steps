@@ -2,70 +2,70 @@
 // Database
 //=======================
 
-/* install mysql-server */
+// install mysql-server 
 > sudo apt install mysql-server
 
-/* INFO: by default the root user that comes with every new MYSQL 8 installation doesn't allow password authentication
-	 we will change that so we can run a special shell script that will take care of many of the installation setps for us. */
+// INFO: by default the root user that comes with every new MYSQL 8 installation doesn't allow password authentication
+	 we will change that so we can run a special shell script that will take care of many of the installation setps for us. 
 	 
-/* log into mysql server */
+// log into mysql server 
 > sudo mysql
 
-/* set password for the root user */
-/* INFO: the caching_sha2_password plugin only available for laravel >= 8.0  */
+// set password for the root user 
+// INFO: This caching_sha2_password plugin is only available in MySQL 8. Other Laravel applications may not work with this plugin, so make sure your application runs on Laravel 8 or higher.  
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '12345678';
 
-/* exit and run the shell script */
+// exit and run the shell script 
 mysql> exit;
 > sudo mysql_secure_installation;
 
-/* INFO: first question ask if you want to install the validate password component which helps ensure all passwords for all
-	 mysql users are secure. (recommended, YES) */
+// INFO: first question ask if you want to install the validate password component which helps ensure all passwords for all
+	 mysql users are secure. (recommended, YES) 
 
-/* INFO: next the script ask if you want to reset the root user password ? */
+// INFO: next the script ask if you want to reset the root user password ? 
 
-/* INFO: next the script ask if you want to remove anaynomous users. this user is created by default so anyone with access to the VBS
-	 can access MySQL easily. (recommended, YSE) */
+// INFO: next the script ask if you want to remove anaynomous users. this user is created by default so anyone with access to the VBS
+	 can access MySQL easily. (recommended, YSE) 
 	 
-/* INFO: next you asked if you want to prevent connections as the root user from outside our server ? (recommended, YES) */
+// INFO: next you asked if you want to prevent connections as the root user from outside our server ? (recommended, YES) 
 
-/* INFO: next ask if you want to remove the test database that mysql creates by default ? */
+// INFO: next ask if you want to remove the test database that mysql creates by default ? 
 
-/* INFO: finally the scripts ask if we want to reload the privieges on MYSQL server ? YES */
+// INFO: finally the scripts ask if we want to reload the privieges on MYSQL server ? YES 
 
 
 
-/* now we will create database for our laravel application */
+// now we will create database for our laravel application 
 
-/* connect to mysql-server as root */
+// connect to mysql-server as root 
 > mysql -u root -p
 
-/* create the database */
-mysql> CREATE DATABASE laracasts CARACTER SET utf8 COLLACTE utf8_unicode_ci;
+// create the database 
+mysql> CREATE DATABASE laracasts CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-/* create mysql user dedicated to the laracasts application */
-mysql> CREATE USER 'laracasts'@'localhost' IDENTIFIED BY '148784845';
+// create mysql user dedicated to the laracasts application 
+mysql> CREATE USER laracasts@localhost IDENTIFIED BY '148784845';
 
-/* grant all privilege on laracasts database  */
+// grant all privilege on laracasts database  
 mysql> GRANT ALL PRIVILEGES ON laracasts.* TO 'laracasts'@'localhost';
 
-/* flush the privileges to clear mysql server cache */
+// flush the privileges to clear mysql server cache 
 mysql> FLUSH PRIVILEGES;
 
-/* finally exit */
+// finally exit 
 mysql> exit;
 
-/* next step is installing the mysql php extenstion so our laravel application can connect to mysql database */
-```> sudo apt install php8.1-mysql```
+// next step is installing the mysql php extenstion so our laravel application can connect to mysql database 
+> sudo apt install php8.1-mysql
 
-/* update .env file  */
+// update .env file  
 DB_USERNAME=laracasts
 DB_PASSWORD=148784845
 
-/* migrate the database */
+// migrate the database 
 > php artisan migrate
 
-/* OPTIONAL: connect to database remotly (select ssh connection in tableplus) */
+// OPTIONAL: connect to database remotly (select ssh connection in tableplus) 
 MySQL Host: localhost
 USERNAME: laracasts
 PASSWORD: 148784845
